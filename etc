@@ -1,0 +1,352 @@
+//     //  attributes:['id','category_name',[db.Sequelize.literal(`(select count(id) from sub_categories where  category_id = CATEGORY.id)`), "count"]],
+//     //         include:{model:SUB_CATEGORY, attributes:['id','sub_category_name']}
+//     //     });
+
+//     // const findProduct = await PRODUCTS.findOne({ where:{include:{ model: SUB_CATEGORY}, attributes: ['id', 'sub_category_name'], include:{ model: CATEGORY , attributes: ['id', 'category_name'] } }})
+//     // if(findProduct){
+        
+//     // }
+//     // if(!findProduct){
+        
+//     // }
+//     // // include:{ model: CATEGORY , attributes: ['id', 'category_name'] }, include:{ model: SUB_CATEGORY , attributes: ['id', 'sub_category_name'], }})
+//     // const { first_name, last_name, mobile_number, dob, gender, email } = req.body;
+//             // const data = {
+//             //     first_name, last_name, mobile_number, dob, gender, password: hasspassword, email, profile_picture:req.file.filename, otp:genrateOtp
+//             // };
+//             // const sub_total = await CART.findOne({
+//             //     include: { model: PRODUCTS, attributes: ["selling_price"] },
+//             //     where:{product_id:reqBody.product_id}
+//             // });
+
+//              // selling_price = getCart[0].product.selling_price
+//         // quantity = getCart[0].product.quantity
+//         // sub_total = selling_price * quantity;
+//         // total_price = parseFloat(sub_total - discount + tax_and_charges).toFixed(2);
+
+//         // const showBill = {
+//         //     Cart: getCart,
+//         //     prices: sub_total,
+//         //     // sub_total,
+//             // discount,
+//             // tax_and_charges,
+//             // total_price
+
+
+//             // exports.order = async (req,res) =>{
+//             //     try {
+//             //         const reqBody = req.body;
+            
+                    
+            
+//             //         const payload = {
+//             //             product_id:reqBody.product_id,
+//             //             quantity:reqBody.quantity,
+//             //             customer_id:reqBody.customer_id,
+//             //             order_status:reqBody.order_status,
+//             //             sub_total:reqBody.sub_total,
+//             //             discount:reqBody.discount,
+//             //             tax_and_charges:reqBody.tax_and_charges,
+//             //             totalpayable:reqBody.totalpayable,
+//             // //             delevery_type:reqBody.delevery_type,
+//             //             payment_type:reqBody.payment_type,
+//             //             // contact_number:reqBody.contact_number,
+//             //             // otp:reqBody.otp,
+//             //            address_id:reqBody.address_id,
+//             //         }
+//             //     } catch (error) {
+                    
+//             //     }
+//             // }
+
+
+//             // exports.getcart = async (req, res) => {
+// //     try {
+// //         const reqQuery = req.query;
+// //         const findUser = await CART.findOne({
+// //             include: { model:PRODUCTS ,attributes: ['id','product_name','image','quantity','selling_price']}
+// //              })
+// //              if(!findUser){
+// //                 return resp.failedResponseWithMsg(res,"NO_ITEM_FOUND")
+// //              }
+
+// //         return resp.successResponse(res, "successfully", findUser)
+// //     } catch (error) {
+// //         return resp.failedResponse(res, error.message)
+// //     }
+// // }
+
+
+// // 
+
+
+// // const reqQuery = req.query;
+
+// // let sub_total = 0, discount = 2, tax_and_charges = 3, selling_price = 0, quantity = 0
+
+// // const getCart = await db.sequelize.query(`
+// //                     SELECT crt.*,
+// //                         (pro.selling_price * crt.quantity) as sub_total_price 
+// //                     FROM carts as crt
+// //                     JOIN products as pro on crt.product_id = pro.id
+// //                     WHERE 
+// //                         crt.customer_id = ${req.currentUser.id};`,
+// //     {
+// //         type: QueryTypes.SELECT
+// //     });
+
+// // const sub_total = await db.sequelize.query(`
+// //                     SELECT 
+// //                         sum(pro.selling_price * crt.quantity) as sub_total ,
+// //                         ${discount} as discount ,
+// //                         sum(pro.selling_price * crt.quantity)-(sum(pro.selling_price * crt.quantity)/100*${discount}) as total_price 
+// //                     FROM carts as crt
+// //                     JOIN products as pro on crt.product_id = pro.id
+// //                     WHERE
+// //                         crt.customer_id = ${req.currentUser.id};`,
+// //     { type: QueryTypes.SELECT });
+
+
+
+
+
+// ///////////////////////////////////////////// Delivery ////////////////////////////////
+
+// // exports.delivery = async (req, res) => {
+// //     try {
+// //         const reqBody = req.body;
+// //         const findData = await ORDER.findOne({ where: { id: req.currentUser.id } });
+// //         if (findData) { return resp.failedResponseWithMsg(res, 'ALLREADY_EXISTS') };
+// //         const data = await ORDER.update({
+// //             delevery_type: reqBody.delevery_type,
+// //             contact_number: reqBody.contact_number
+// //         }, { where: { customer_id: reqBody.customer_id } });
+// //         return resp.successResponse(res, "SUCCESS", data);
+// //     } catch (error) {
+// //         return resp.failedResponse(res, error.message);
+// //     }
+// // }
+
+
+
+
+
+// exports.order = async (req, res) => {
+//     try {
+
+//         const reqBody = req.body;
+//         const findUser = await CUSTOMERS.findOne({ where: { id: req.currentUser.id } })
+//         if (!findUser.is_verify_delivery == 1) {
+//             return resp.failedResponseWithMsg(res, "USER_NOT_VERIFIED")
+//         }
+//         const findcart = await CART.findAll({
+//             attributes: [
+//                 'product_id',
+//                 'quantity',
+//                 'customer_id',
+//                 [db.sequelize.literal('(product.selling_price * cart.quantity)'), 'sub_total'],
+//             ],
+//             where: { customer_id: req.currentUser.id, cart_status: 1 },
+//             include: [{
+//             model: PRODUCTS,
+//                 attributes: []
+//             }],
+//             raw: true
+//         });
+//         // console.log("==============",findcart );
+//         // return resp.successResponse(res, findcart)
+//         if (findcart == null) {
+//             return resp.failedResponseWithMsg(res, "YOUR_CART_IS_EMPTY");
+//         }
+//         let order_Cid = generateUniqueCode(6);
+
+//         const bulkdata = findcart.map(doc => {
+//             let { product_id, quantity, customer_id, sub_total, discount, tax_and_charges, delivery_charges } = doc.dataValues
+//             console.log(doc.dataValues);
+//             return {
+//                 order_status: reqBody.order_status,
+//                 delevery_type: reqBody.delevery_type,
+//                 payment_type: reqBody.payment_type,
+//                 contact_number: reqBody.contact_number,
+//                 address_id: reqBody.address_id,
+//                 delevery_type: reqBody.delevery_type,
+//                 order_Cid: order_Cid,
+//                 product_id,
+//                 quantity,
+//                 customer_id,
+//                 sub_total,
+//                 discount,
+//                 tax_and_charges,
+//                 delivery_charges,
+//             }
+//         })
+//         const data = await ORDER.bulkCreate(bulkdata)
+//         // await CART.update({ cart_status: 2 }, { where: { customer_id: req.currentUser.id, cart_status: 1 } })
+//         return resp.successResponse(res, 'SUCCESS', data)
+//     } catch (error) {
+//         return resp.failedResponse(res, error.message)
+//     }
+// }
+
+
+
+
+// /////////////////
+
+
+
+// exports.order = async (req, res) => {
+//     try {
+
+//         const findUser = await CUSTOMERS.findOne({ where: { id: req.currentUser.id } })
+//         if (!findUser.is_verify_delivery == 1) {
+//             return resp.failedResponseWithMsg(res, "USER_NOT_VERIFIED")
+//         }
+//         let discount = 2;
+//         let tax_and_charges = 20;
+//         let delivery_charges = 5;
+//         const reqBody = req.body;
+//         const findcart = await CART.findAll({
+//             where: { customer_id: req.currentUser.id, cart_status: 1 },
+//             attributes: [
+//                 'product_id',
+//                 'quantity',
+//                 'customer_id',
+//                 [db.sequelize.literal('product.selling_price * cart.quantity'), 'sub_total'],
+//                 [db.sequelize.literal(':discount'), 'discount'],
+//                 [db.sequelize.literal(':tax_and_charges'), 'tax_and_charges'],
+//                 [db.sequelize.literal(':delivery_charges'), 'delivery_charges'],
+//                 [db.sequelize.literal('sum(product.selling_price * cart.quantity) - (sum(product.selling_price * cart.quantity) / 100 * :discount) + (:tax_and_charges + :delivery_charges)'), 'total_price']
+//             ],
+//             include: { model: PRODUCTS, attributes:[],
+//                 include:{ model: ORDER, attributes: ['payment_type','delevery_type']},
+//                  include:{model: ADDRESS}
+//             },
+//             raw: true,
+//             replacements: { discount, tax_and_charges, delivery_charges },
+//         });
+
+//         if (findcart == null) {
+//             return resp.failedResponseWithMsg(res, "YOUR_CART_IS_EMPTY");
+//         }
+//         const showBill = {
+//             prices: sub_total,
+//         };
+
+//         let order_Cid = generateUniqueCode(6);
+
+//         const bulkdata = findcart.map(doc => {
+//             let { product_id, quantity, customer_id, sub_total,discount,tax_and_charges,delivery_charges } = doc.dataValues
+//             return {
+//                 order_status: reqBody.order_status,
+//                 delevery_type: reqBody.delevery_type,
+//                 payment_type: reqBody.payment_type,
+//                 contact_number: reqBody.contact_number,
+//                 address_id: reqBody.address_id,
+//                 delevery_type: reqBody.delevery_type,
+//                 order_Cid: order_Cid,
+//                 product_id,
+//                 quantity,
+//                 customer_id,
+//                 sub_total,
+//                 discount,
+//                 tax_and_charges,
+//                 delivery_charges,
+//             }
+//         })
+
+//         const data = await ORDER.bulkCreate(bulkdata)
+//         // await CART.update({ cart_status: 2 }, { where: { customer_id: req.currentUser.id, cart_status: 1 } })
+//         return resp.successResponse(res, 'SUCCESS', [data,showBill])
+//     } catch (error) {
+//         return resp.failedResponse(res, error.message)
+//     }
+// }
+
+// exports.service_provider_orderlists = async (req, res) => {
+//     try {
+//         const finduser = await ORDER.findAll({
+//             where: { product_id: req.query.product_id },
+//             attributes: ['id','quantity'],
+//             include: { model: PRODUCTS, attributes: ['id', 'sellers_id'] }
+//         })
+//         return resp.successResponse(res, "succes", finduser)
+//     } catch (error) {
+//         return resp.failedResponse(res, error.message)
+//     }
+// }
+
+
+
+
+
+//         // const sub_total = await CART.findAll({
+//         //     where: { cart_status: '1', customer_id: req.currentUser.id },
+//         //     attributes: [
+//         //         [db.sequelize.literal('sum(product.selling_price * cart.quantity)'), 'sub_total'],
+//         //         [db.sequelize.literal(':discount'), 'discount'],
+//         //         [db.sequelize.literal(':tax_and_charges'), 'tax_and_charges'],
+//         //         [db.sequelize.literal(':delivery_charges'), 'delivery_charges'],
+//         //         [db.sequelize.literal('sum(product.selling_price * cart.quantity) - (sum(product.selling_price * cart.quantity) / 100 * :discount) + (:tax_and_charges + :delivery_charges)'), 'total_price']
+//         //     ],
+//         //     include: [{ model: PRODUCTS, attributes: [] }],
+//         //     raw: true,
+//         //     replacements: { discount, tax_and_charges, delivery_charges },
+//         // });
+
+
+
+
+
+//         /////////////////////////////////CATEGORY/////////////////////////////////////////////////////
+// exports.category = async (req, res) => {
+//     try {
+//         const reqBody = req.body;
+//         const findData = await CATEGORY.findOne({ where: { category_name: reqBody.category_name } });
+//         if (findData) { return resp.failedResponseWithMsg(res, 'CATEGORY_ALLREADY_EXISTS') };
+//         const playload = { category_name: reqBody.category_name }
+//         const data = await CATEGORY.create(playload);
+//         return resp.successResponse(res, "SUCCESS", data);
+//     } catch (error) {
+//         return resp.failedResponse(res, error.message);
+//     }
+// };
+
+
+
+// ///////////////////////////////SUB CATEGORY////////////////////////////////////////////////////
+// exports.sub_category = async (req, res) => {
+//     try {
+//         const reqBody = req.body;
+//         const findData = await SUB_CATEGORY.findOne({
+//             where: {
+//                 sub_category_name: reqBody.sub_category_name
+//             }
+//         })
+//         if (findData) {
+//             return resp.failedResponseWithMsg(res, 'CATEGORY_ALLREADY_EXISTS')
+//         }
+//         const playload = {
+//             category_id: reqBody.category_id,
+//             sub_category_name: reqBody.sub_category_name
+//         }
+//         const data = await SUB_CATEGORY.create(playload);
+//         return resp.successResponse(res, "SUCCESS", data);
+//     } catch (error) {
+//         return resp.failedResponse(res, error.message);
+//     }
+
+// };
+
+
+
+// exports.catalog = async (req, res) => {
+//     try {
+//         const findData = await CATEGORY.findAll({
+//             include: { model: PRODUCTS, attributes: ['id', 'image', 'product_name', 'product_details'] }
+//         })
+//         return resp.successResponse(res, "SUCCESS", findData);
+//     } catch (error) {
+//         return resp.failedResponse(res, error.message)
+//     }
+// };
